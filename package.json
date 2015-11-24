@@ -29,6 +29,7 @@
     "co-tape": "^1",
     "coffee-coverage": "^0.7",
     "coffee-script": "^1.10",
+    "coveralls": "^2.11",
     "faucet": "*",
     "istanbul": "^0.4.1",
     "koa": "<2",
