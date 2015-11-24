@@ -3,3 +3,5 @@ node_js:
   - "4"
   - "5"
   - "iojs"
+after_success:
+  - ./node_modules/.bin/coveralls < coverage/lcov.info
