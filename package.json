@@ -5,7 +5,9 @@
   "main": "koa-signed-url.js",
   "scripts": {
     "prepublish": "coffee --compile --map *.coffee",
-    "test": "coffee test.coffee | faucet"
+    "pretest": "coffeeCoverage --inst istanbul --exclude test.coffee,node_modules . .",
+    "test": "istanbul cover --print none coffee test.coffee | faucet",
+    "posttest": "istanbul report text-summary"
   },
   "keywords": [
     "signed URL",
@@ -21,8 +23,10 @@
   "devDependencies": {
     "co-request": "^1",
     "co-tape": "^1",
+    "coffee-coverage": "^0.7",
     "coffee-script": "^1.10",
     "faucet": "*",
+    "istanbul": "^0.4.1",
     "koa": "<2",
     "tape": "^4.2.2"
   }
