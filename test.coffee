@@ -1,4 +1,4 @@
-# copyright 2015 Jess Austin <jess.austin@gmail.com>
+# copyright (c) 2015 Jess Austin <jess.austin@gmail.com>
 # released under MIT License
 
 request = require 'co-request'
