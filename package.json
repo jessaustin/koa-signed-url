@@ -13,7 +13,7 @@
     "signature",
     "verify"
   ],
-  "main": "koa-signed-url.js",
+  "main": "koa-signed-url",
   "scripts": {
     "clean": "rm -r *.js *.js.map coverage 2> /dev/null || true",
     "prepublish": "coffee --compile --map *.coffee",

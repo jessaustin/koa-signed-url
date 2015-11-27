@@ -8,7 +8,7 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
   port = 2999
 
   app = require('koa')()
-  signedUrl = require('./koa-signed-url') 'secret'
+  signedUrl = require('.') 'secret'
   app.use signedUrl
   app.use (next) ->
     @body = body
