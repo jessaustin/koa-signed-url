@@ -15,6 +15,7 @@
   ],
   "main": "koa-signed-url.js",
   "scripts": {
+    "clean": "rm -r *.js *.js.map coverage 2> /dev/null || true",
     "prepublish": "coffee --compile --map *.coffee",
     "pretest": "coffeeCoverage --inst istanbul --exclude test.coffee,node_modules . .",
     "test": "istanbul cover --print none coffee test.coffee | faucet",
