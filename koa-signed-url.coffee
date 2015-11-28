@@ -17,14 +17,14 @@ module.exports = (keys, sigId='sig') ->
 
   debug "using Keygrip with hash #{keys.hash} and keys #{keys}"
 
-  fn = (next) ->
+  fn = (next) ->          # this is the koa middleware
     # don't let anything through that will cause Keygrip.verify() to stop early
     match = @href
       .match ///[?&]#{sigId}=                        # don't capture this
                 ((?:[A-Z]|[a-z]|\d|[+/])*={0,2})$/// # only 64 chars + 0-2 "="s
 
     if match? and
-              keys.verify @href[...match?.index], new Buffer match[1], 'base64'
+              keys.verify @href[...match.index], new Buffer match[1], 'base64'
       debug "verified #{@href}"
       yield next
     else
@@ -35,6 +35,6 @@ module.exports = (keys, sigId='sig') ->
     sig = keys.sign url
       .toString 'base64'
     debug "signing #{url} with signature #{sig}"
-    "#{url}#{if url.search '?' is -1 then '?' else '&'}#{sigId}=#{sig}"
+    "#{url}#{if url.indexOf('?') is -1 then '?' else '&'}#{sigId}=#{sig}"
 
   fn                      # now return the original function

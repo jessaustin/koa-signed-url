@@ -1,38 +1,45 @@
 # copyright (c) 2015 Jess Austin <jess.austin@gmail.com>
 # released under MIT License
 
+http = require 'http'
+Keygrip = require 'keygrip'
+koa = require 'koa'
 request = require 'co-request'
+
+signed = require '.'
 
 require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
   body = 'This is a test.'
   port = 2999
-
-  app = require('koa')()
-  signedUrl = require('.') 'secret'
-  app.use signedUrl
-  app.use (next) ->
+  yieldBody = (next) ->
     @body = body
     yield next
-  server = require 'http'
-    .createServer app.callback()
-    .listen port
 
+  keysList = [ 'secret', ['secret', 'another'], Keygrip ['secret', 'another'] ]
   url = "http://localhost:#{port}/"
   pathParts = ['', 'path', '/subpath/', 'leaf', '?q=query', '&more=queries']
-  tape.plan 5 * pathParts.length
+  tape.plan 5 * pathParts.length * keysList.length
 
-  for part in pathParts
-    url += part
+  for keys in keysList
+    app = koa()
+    signedUrl = signed keys
+    app.use signedUrl
+    app.use yieldBody
+    server = http.createServer app.callback()
+      .listen port
 
-    sig = signedUrl.sign url
-    resp = yield request sig
-    tape.equal resp.statusCode, 200, 'Should verify correct signature.'
-    tape.equal resp.body, body, 'Should serve correct body.'
-    resp = yield request sig + 'x'
-    tape.equal resp.statusCode, 404, 'Should reject expanded signature.'
-    resp = yield request sig[...-3]
-    tape.equal resp.statusCode, 404, 'Should reject truncated signature.'
-    resp = yield request sig + '&yet=another_query'
-    tape.equal resp.statusCode, 404, 'Should reject non-canonical URL.'
+    for part in pathParts
+      url += part
 
-  server.close()
+      sig = signedUrl.sign url
+      resp = yield request sig
+      tape.equal resp.statusCode, 200, 'Should verify correct signature.'
+      tape.equal resp.body, body, 'Should serve correct body.'
+      resp = yield request sig + 'x'
+      tape.equal resp.statusCode, 404, 'Should reject expanded signature.'
+      resp = yield request sig[...-3]
+      tape.equal resp.statusCode, 404, 'Should reject truncated signature.'
+      resp = yield request sig + '&yet=another_query'
+      tape.equal resp.statusCode, 404, 'Should reject non-canonical URL.'
+
+    server.close()

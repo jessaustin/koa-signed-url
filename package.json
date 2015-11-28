@@ -17,9 +17,9 @@
   "scripts": {
     "clean": "rm -r *.js *.js.map coverage 2> /dev/null || true",
     "prepublish": "coffee --compile --map *.coffee",
-    "pretest": "coffeeCoverage --inst istanbul --exclude test.coffee,node_modules . .",
-    "test": "istanbul cover --print none coffee test.coffee | faucet",
-    "posttest": "istanbul report text-summary"
+    "pretest": "coffee --compile --map koa-signed-url.coffee",
+    "test": "istanbul cover --print none coffeetape test.coffee | faucet && istanbul report text-summary",
+    "posttest": "remap-istanbul --input coverage/coverage.json --output coverage/coffee --type html"
   },
   "dependencies": {
     "debug": "^2.2",
@@ -28,12 +28,13 @@
   "devDependencies": {
     "co-request": "^1",
     "co-tape": "^1",
-    "coffee-coverage": "^0.7",
     "coffee-script": "^1.10",
+    "coffeetape": "^1.0",
     "coveralls": "^2.11",
     "faucet": "*",
-    "istanbul": "^0.4.1",
+    "istanbul": "^0.4",
     "koa": "<2",
-    "tape": "^4.2.2"
+    "remap-istanbul": "^0.4",
+    "tape": "^4.2"
   }
 }
