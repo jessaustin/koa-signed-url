@@ -19,7 +19,7 @@ uses [keygrip][keygrip] for signing and verifying, like the [cookies
 The exported middleware function has a [`.sign()`](#signurl---url) function
 property for generating signed URLs in the first place.  The idea is that a
 [Koa][koa] application can generate signed URLs for e.g. a password reset
-facility, distribe them via e.g. email or SMS, and then verify signatures on
+facility, distribute them via e.g. email or SMS, and then verify signatures on
 those URLs when they are used, essentially as ["capability" URLs][capability].
 Because [HMAC signatures](https://tools.ietf.org/html/rfc2104) are used, the
 [Koa][koa] application just stores application-level symmetric keys, rather
