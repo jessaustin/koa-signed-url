@@ -51,7 +51,7 @@ app.use(function *() {
 
 ## API
 
-### koa-signed-url(keys, [sigId]) -> { [Function] sign: [Function] }
+### koa-signed-url(keys, [sigId]) ⟶ { [Function] sign: [Function] }
 
 `keys` is either a single character string key (which should be at least 32
 characters in length), or an array of such keys, or a `Keygrip` object. `sigId`
@@ -64,7 +64,7 @@ will simply yield to the next middleware. If it cannot, it will set
 `this.status = 404` and end request processing. This middleware function has a
 property `sign`, which is also a function:
 
-### sign(url) -> url
+### sign(url) ⟶ url
 
 The `url` passed to this function is returned with a signature parameter
 appended to the query string.
