@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "debug": "^2.2",
-    "keygrip": "github:crypto-utils/keygrip"
+    "keygrip": "git+https://github.com/crypto-utils/keygrip.git"
   },
   "devDependencies": {
     "co-request": "^1",
