@@ -1,32 +1,72 @@
 # koa-signed-url
 
+[![Build Status][travis-img]][travis-url]
+[![Coverage Status][cover-img]][cover-url]
+[![Dependency Status][david-img]][david-url]
+[![Dev Dependency Status][david-dev-img]][david-dev-url]
+
 [Koa][koa] middleware that sets a `404 Not Found` status when it can't verify
 the signature on a *signed URL*. Signed URLs are much like [signed
 cookies](https://code.djangoproject.com/wiki/Signing#Justification): data that
 is sent to the user for eventual return to the server, where the signature is
 verified to confirm that the data has not been modified. Signed cookies work
 well in the web browser, while signed URLs are necessary when data must be
-verifiably communicated in other contexts, such as through email. This module
+verifiably communicated in other situations, such as through email. This module
 uses [keygrip][keygrip] for signing and verifying, like the [cookies
 ](https://www.npmjs.com/package/cookies) module does.
 
-The exported middleware function has a `.sign()` function property for
-generating signed URLs in the first place.  The idea is that a [Koa][koa]
-application can generate signed URLs for e.g. a password reset facility,
-distribe them via e.g. email or SMS, and then verify signatures on those URLs
-when they are used, essentially as ["capability" URLs][capability]. Because
-[HMAC signatures](https://tools.ietf.org/html/rfc2104) are used, the [Koa][koa]
-application just stores application-level symmetric keys, rather than a dynamic
-list of all URLs that have ever been generated. There are several factors to
-consider when using this module to generate and verify secure URLs: see the
-[Security Considerations](#security-considerations) section of this document.
-
-[![Build Status][travis-img]][travis-url]
-[![Coverage Status][cover-img]][cover-url]
-[![Dependency Status][david-img]][david-url]
-[![Dev Dependency Status][david-dev-img]][david-dev-url]
+The exported middleware function has a [`.sign()`](#signurl---url) function
+property for generating signed URLs in the first place.  The idea is that a
+[Koa][koa] application can generate signed URLs for e.g. a password reset
+facility, distribe them via e.g. email or SMS, and then verify signatures on
+those URLs when they are used, essentially as ["capability" URLs][capability].
+Because [HMAC signatures](https://tools.ietf.org/html/rfc2104) are used, the
+[Koa][koa] application just stores application-level symmetric keys, rather
+than a dynamic list of all URLs that have ever been generated. There are
+several factors to consider when using this module to generate and verify
+secure URLs: see the [Security Considerations](#security-considerations)
+section of this document.
 
 ## Example
+
+Suppose we have an application that allows users to share uploaded documents
+with their friends. The part of the application that generates "share"
+notifications could look like this:
+```javascript
+signed = require('koa-signed-url')(keys);
+app.use(route.post('/document/:id/', function *(id) {
+  yield sendEmail(signed.sign('https://example.com/shared-doc?id='+id));
+  this.body = 'Emailed link.'
+}));
+```
+Then the part of the application that serves the shared documents could be
+something like this:
+```javascript
+app.use(signed);
+app.use(function *() {
+  this.body = yield getDocument(this.query.id);
+});
+```
+
+## API
+
+### koa-signed-url(keys, [sigId]) -> { [Function] sign: [Function] }
+
+`keys` is either a single character string key (which should be at least 32
+characters in length), or an array of such keys, or a `Keygrip` object. `sigId`
+is optional, defaults to `"sig"`, and is the name of the query parameter used
+to hold the URL signature.
+
+The returned function is usable as [Koa][koa] middleware. It will attempt to
+verify the URL signature on all requests. If it can verify the signature, it
+will simply yield to the next middleware. If it cannot, it will set
+`this.status = 404` and end request processing. This middleware function has a
+property `sign`, which is also a function:
+
+### sign(url) -> url
+
+The `url` passed to this function is returned with a signature parameter
+appended to the query string.
 
 ## Security Considerations
 
@@ -59,9 +99,9 @@ in a webpage. If a client can follow a link it can also save a session cookie,
 which obviates signed URLs entirely. URLs are signed so that they may be
 communicated without using web clients. That does not guarantee that they'll
 never be seen by browsers, or passed on from browsers to other servers. As the
-[W3C document][capability] suggests, [`robots.txt`](http://www.robotstxt.org/)
-and `rel=noreferrer` should be used to protect signed URLs once they reach the
-web browser. 
+[W3C document][capability] suggests, [`robots.txt`](http://www.robotstxt.org/),
+user-input data sanitization, and `rel=noreferrer` should be used to protect
+signed URLs once they reach the web browser. 
 
 ### "Canonicalization"
 
@@ -72,13 +112,13 @@ module will reject such "extended" URLs automatically, but that could be
 defeated if implementors attempt to be too clever in routing or authorizing
 *before* signature verification takes place. For example the following code is
 very bad:
-```javascript```
+```javascript
 /* VERY BAD INSECURE CODE DO NOT USE!!! */
 app.use(function *(next) {
   if (this.query.logged_in === 'true') {
     this.session.logged_in = true;
   }
-  yield(next);
+  yield next;
 });
 app.use(koaSignedUrl(keys)); /* too late!!! */
 ```
@@ -87,21 +127,23 @@ host, port, path, *and* query) *before* signing it, and to verify the URL
 *before* doing anything with any component of it. One should `app.use()` the
 middleware provided by this module *as soon as possible*.
 
-### SHA256 Please
+### SHA-256 Please
 
 This module depends on version 2 of [keygrip][keygrip]. That version [wisely
 ](http://csrc.nist.gov/publications/drafts/800-131A/sp800-131a_r1_draft.pdf)
-upgrades the default hash algorithm to SHA-256. **Do not** pass in a Keygrip
+upgrades the default hash algorithm to SHA-256. **Do not** pass in a `Keygrip`
 object with the hash algorithm downgraded to e.g. SHA-1 or MD5.
 
 ### Unique Identifiers
 
 Depending on the situation, a simple url like
-`https://example.com/reset-password?user=alice&timestamp=1448688469&sig=fh0B70oHoT0tjP9Ip=` may
-suffice. In other contexts, it may be necessary to generate a unique random
+```
+https://example.com/reset-password?user=alice&expires=1448688469&sig=fh0B70oHoT0tjP9Ip+whuktdr8EcUjJVsJetJLUVJAE=
+```
+may suffice. In other contexts, it may be necessary to generate a unique random
 identifier to include in a signed URL. This could be if the URL is of a
-transactional nature: each transaction that requires user action should have
-its own URL. [Experts
+transactional nature: each transaction that requires user action would have its
+own URL. [Experts
 ](http://www.daemonology.net/blog/2009-06-11-cryptographic-right-answers.html)
 [agree](https://gist.github.com/tqbf/be58d2d39690c3b366ad), random identifiers
 should be 256 bits in size. Since this identifier is used in a URL, it should
@@ -120,7 +162,7 @@ the module maintainer know of anything else that should be included.
 
 **koa-signed-url** is by Jess Austin and is distributed under the terms of the
 [MIT License](http://opensource.org/licenses/MIT). Any and all potential
-contributions of issues or PRs are welcome!
+contributions of issues and pull requests are welcome!
 
 [koa]: http://koajs.com/
 [keygrip]: https://www.npmjs.com/package/keygrip
