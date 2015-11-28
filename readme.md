@@ -121,7 +121,7 @@ app.use(function *(next) {
   }
   yield next;
 });
-app.use(koaSignedUrl(keys)); /* too late!!! */
+app.use(signed);    /* too late!!! */
 ```
 The solution to this problem is to completely determine the URL (protocol,
 host, port, path, *and* query) *before* signing it, and to verify the URL
