@@ -8,6 +8,7 @@
   "keywords": [
     "koa",
     "koajs",
+    "koa middleware",
     "koa-middleware",
     "signed URL",
     "signature",
