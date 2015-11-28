@@ -1,5 +1,6 @@
 # koa-signed-url
 
+[![NPM][npmjs-img]][npmjs-url]
 [![Build Status][travis-img]][travis-url]
 [![Coverage Status][cover-img]][cover-url]
 [![Dependency Status][david-img]][david-url]
@@ -167,6 +168,8 @@ contributions of issues and pull requests are welcome!
 [koa]: http://koajs.com/
 [keygrip]: https://www.npmjs.com/package/keygrip
 [capability]: http://www.w3.org/TR/capability-urls/
+[npmjs-url]: https://www.npmjs.org/package/koa-signed-url "npm Registry"
+[npmjs-img]: https://badge.fury.io/js/koa-signed-url.svg
 [travis-img]: https://travis-ci.org/jessaustin/koa-signed-url.svg?branch=master
 [travis-url]: https://travis-ci.org/jessaustin/koa-signed-url "Travis"
 [cover-img]: https://coveralls.io/repos/jessaustin/koa-signed-url/badge.svg
