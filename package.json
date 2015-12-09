@@ -35,7 +35,7 @@
     "faucet": "*",
     "istanbul": "^0.4",
     "koa": "<2",
-    "remap-istanbul": "^0.4",
+    "remap-istanbul": "^0.5",
     "tape": "^4.2"
   }
 }
