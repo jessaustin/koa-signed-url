@@ -18,11 +18,11 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
     yield next
 
   keysList = [ 'secret', ['secret', 'another'], Keygrip ['secret', 'another'] ]
-  url = "http://localhost:#{port}/"
   pathParts = ['', 'path', '/subpath/', 'leaf.ext', '?q=query', '&r=queries']
   tape.plan 5 * pathParts.length * keysList.length
 
   for keys in keysList
+    url = "http://localhost:#{port}/"
     app = koa()
     signedUrl = signed keys
     app.use signedUrl
