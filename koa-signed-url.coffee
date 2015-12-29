@@ -1,5 +1,7 @@
-# copyright (c) 2015 Jess Austin <jess.austin@gmail.com>
-# released under MIT License
+###
+Copyright (c) 2015 Jess Austin <jess.austin@gmail.com>
+Released under MIT License
+###
 
 debug = (require 'debug') 'koa-signed-url'
 Keygrip = require 'keygrip'
