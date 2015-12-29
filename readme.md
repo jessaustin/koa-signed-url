@@ -84,8 +84,10 @@ there are several steps one could take, depending on the situation.
 First, it seems wise to append an `expires=<timestamp>` query parameter to the
 URL *before* signing it. (The timestamp would be a date in the very near
 future.) Signature verification ensures that the timestamp may not be changed,
-and a simple timestamp is easy to vary in order to enforce desired policies. In
-addition, timestamps act as anti-replay-attack "nonces".
+and a simple timestamp is easy to vary in order to enforce desired policies.
+(This module handles signature verification, but does **not** check that
+timestamps have not elapsed!) In addition, timestamps act as anti-replay-attack
+"nonces".
 
 Second, one could keep a dynamic "CRL"-style list of used URLs, and thus reject
 URLs that have already been accessed. In order to avoid having to track used
