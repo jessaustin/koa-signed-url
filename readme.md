@@ -104,7 +104,7 @@ communicated without using web clients. That does not guarantee that they'll
 never be seen by browsers, or passed on from browsers to other servers. As the
 [W3C document][capability] suggests, [`robots.txt`](http://www.robotstxt.org/),
 user-input data sanitization, and `rel=noreferrer` should be used to protect
-signed URLs once they reach the web browser. 
+signed URLs once they reach the web browser.
 
 ### "Canonicalization"
 
@@ -128,7 +128,14 @@ app.use(signed);    /* too late!!! */
 The solution to this problem is to completely determine the URL (protocol,
 host, port, path, *and* query) *before* signing it, and to verify the URL
 *before* doing anything with any component of it. One should `app.use()` the
-middleware provided by this module *as soon as possible*.
+middleware provided by this module as soon as possible. No sooner than that,
+however: the middleware will reject all URLs without signatures, and most of
+your URLs don't need to be signed. This means either that you'll handle URLs
+that need to be signed last, or you'll need some sort of strange nested `yield`
+hack. [This limitation is not ideal, so suggestions for improvement are
+welcome. Any suggestion that the module should ever accept unsigned (rather
+than signed with an invalid signature) URLs is right out, however, since that
+would introduce dangerous failure modes.]
 
 ### SHA-256 Please
 
@@ -159,7 +166,7 @@ url = koaSignedUrl.sign('https://example.com/view-order?id=' + id);
 ### Please Suggest Additional Security Considerations
 
 This is certainly not an exhaustive list of security considerations. Please let
-the module maintainer know of anything else that should be included. 
+the module maintainer know of anything else that should be included.
 
 ## Thanks!
 
