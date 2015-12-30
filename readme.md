@@ -64,7 +64,7 @@ will simply yield to the next middleware. If it cannot, it will set
 `this.status = 404` and end request processing. This middleware function has a
 property `sign`, which is also a function:
 
-### sign(url) ⟶ url
+### sign (url)⟶ url
 
 The `url` passed to this function is returned with a signature parameter
 appended to the query string.
