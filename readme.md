@@ -37,7 +37,7 @@ notifications could look like this:
 signed = require('koa-signed-url')(keys);
 app.use(route.post('/document/:id/', function *(id) {
   yield sendEmail(signed.sign('https://example.com/shared-doc?id='+id));
-  this.body = 'Emailed link.'
+  this.status = 204
 }));
 ```
 Then the part of the application that serves the shared documents could be
