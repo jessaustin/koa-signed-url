@@ -90,9 +90,11 @@ timestamps have elapsed!) In addition, timestamps act as anti-replay-attack
 "nonces".
 
 Second, one could keep a dynamic "CRL"-style list of used URLs, and thus reject
-URLs that have already been accessed. In order to avoid having to track used
-URLs over longer periods, this technique would be combined with the previous
-one. Or it might be possible to control multiple uses of URLs in the underlying
+URLs that have already been accessed. (In some cases, a hash, a set, or even a
+[Bloom filter](//en.wikipedia.org/wiki/Bloom_filter) could be a more suitable
+data stucture than a simple list.) In order to avoid having to track used URLs
+over longer periods, this technique would be combined with the previous one. Or
+it might be possible to control multiple uses of URLs in the underlying
 resources to which they refer.
 
 ### *Try* to Keep URLs Secret, Anyway
