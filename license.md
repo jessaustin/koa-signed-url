@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 
-Copyright &copy; 2015 Jess Austin
+Copyright © 201{5,6} Jess Austin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

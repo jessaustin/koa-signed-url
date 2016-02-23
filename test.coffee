@@ -1,5 +1,5 @@
 ###
-Copyright (c) 2015 Jess Austin <jess.austin@gmail.com>
+Copyright © 201{5,6} Jess Austin <jess.austin@gmail.com>
 Released under MIT License
 ###
 
