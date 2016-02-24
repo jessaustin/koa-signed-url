@@ -6,11 +6,15 @@ Released under MIT License
 debug = (require 'debug') 'koa-signed-url'
 Keygrip = require 'keygrip'
 
+add_query_parameter = (uri, name, value) ->
+  [ uri, query ] = uri.split '?'
+  "#{uri}?#{if query? then query + '&' else ''}#{name}=#{value}"
+
 # Export a function that returns url-signature-verifying middleware, with a
 # "sign" property containing a url-signing function. Urls are signed by
 # appending a signature to the query string. See readme.md for advice on secure
 # use of this module.
-module.exports = (keys, sigId='sig') ->
+module.exports = (keys, sigId='sig', expId='exp') ->
   # keys can be passed in as a single key, an array of keys, or a Keygrip
   unless keys?.constructor?.name is 'Keygrip'
     unless Array.isArray keys
@@ -33,10 +37,15 @@ module.exports = (keys, sigId='sig') ->
       @status = 404
       debug "failed to verify #{@href}"
 
-  fn.sign = (url) ->      # add function as a property of preceeding function
-    sig = keys.sign url
+  fn.sign = (uri, duration=0) ->  # sign() is a property of preceeding function
+    # don't sign fragment
+    [ uri, fragment ] = uri.split '#'
+
+    if duration
+      uri = add_query_parameter uri, expId, new Date().valueOf() + duration
+    sig = keys.sign uri
       .toString 'base64'
-    debug "signing #{url} with signature #{sig}"
-    "#{url}#{if url.indexOf('?') is -1 then '?' else '&'}#{sigId}=#{sig}"
+    debug "signing #{uri} with signature #{sig}"
+    add_query_parameter(uri, sigId, sig) + if fragment? then '#' + fragment else ''
 
   fn                      # now return the original function
