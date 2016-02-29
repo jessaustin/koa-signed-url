@@ -25,7 +25,9 @@ module.exports = (keys, sigId='sig', expId='exp') ->
 
   fn = (next) ->          # this is the koa middleware
     [ ..., uri, sig ] = @href.split ///[?&]#{sigId}=///
-    [ sig, rest, ... ] = sig.split '='
+    # clean up before passing to Buffer which will ignore anything after a '='
+    [ sig, rest... ] = sig.split '='
+    rest = rest.reduce ((acc, {length}) -> acc or length), false
     if uri? and not rest and keys.verify uri, new Buffer sig, 'base64'
       debug "verified #{@href}"
       yield next
