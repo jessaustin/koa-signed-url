@@ -195,4 +195,3 @@ contributions of issues and pull requests are welcome!
 [david-dev-img]: https://david-dm.org/jessaustin/koa-signed-url/dev-status.svg
 [david-dev-url]: https://david-dm.org/jessaustin/koa-signed-url#info=devDependencies
   "David for devDependencies"
-
