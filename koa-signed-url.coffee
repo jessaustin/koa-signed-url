@@ -34,7 +34,7 @@ module.exports = (keys, sigId='sig', expId='exp') ->
       debug "failed to verify #{@href}"
     else
       { query } = parse url, yes
-      if parseInt(query[expId]) <= new Date().valueOf()
+      if new Date().valueOf() >= parseInt query[expId]
         @status = 404
         debug "#{@href} expired at #{query[expId]}"
       else
