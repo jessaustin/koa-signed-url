@@ -3,6 +3,7 @@ Copyright © 201{5,6} Jess Austin <jess.austin@gmail.com>
 Released under MIT License
 ###
 
+{ parse } = require 'url'
 debug = (require 'debug') 'koa-signed-url'
 Keygrip = require 'keygrip'
 
@@ -25,15 +26,20 @@ module.exports = (keys, sigId='sig', expId='exp') ->
 
   fn = (next) ->          # this is the koa middleware
     [ ..., uri, sig ] = @href.split ///[?&]#{sigId}=///
-    # clean up before passing to Buffer which will ignore anything after a '='
+    # Buffer will ignore anything after a '=', so check for that
     [ sig, rest... ] = sig.split '='
     rest = rest.reduce ((acc, {length}) -> acc or length), false
-    if uri? and not rest and keys.verify uri, new Buffer sig, 'base64'
-      debug "verified #{@href}"
-      yield next
-    else
+    unless uri? and not rest and keys.verify uri, new Buffer sig, 'base64'
       @status = 404
       debug "failed to verify #{@href}"
+    else
+      { query } = parse uri, yes
+      if parseInt(query[expId]) <= new Date().valueOf()
+        @status = 404
+        debug "#{@href} expired at #{query[expId]}"
+      else
+        debug "verified #{@href}"
+        yield next
 
   fn.sign = (uri, duration=0) ->  # sign() is a property of preceeding function
     # don't sign fragment
