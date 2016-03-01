@@ -1,6 +1,6 @@
 {
   "name": "koa-signed-url",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Koa middleware that 404s when the signature on a URL can't be verified.",
   "repository": "https://github.com/jessaustin/koa-signed-url",
   "author": "Jess Austin <jess.austin@gmail.com>",
