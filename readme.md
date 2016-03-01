@@ -16,17 +16,16 @@ verifiably communicated in other situations, such as through email. This module
 uses [keygrip][keygrip] for signing and verifying, like the [cookies
 ](https://www.npmjs.com/package/cookies) module does.
 
-The exported middleware function has a [`.sign()`](#sign-url-url) function
-property for generating signed URLs in the first place.  The idea is that a
-[Koa][koa] application can generate signed URLs for e.g. a password reset
-facility, distribute them via e.g. email or SMS, and then verify signatures on
-those URLs when they are used, essentially as ["capability" URLs][capability].
-Because [HMAC signatures](https://tools.ietf.org/html/rfc2104) are used, the
-[Koa][koa] application just stores application-level symmetric keys, rather
-than a dynamic list of all URLs that have ever been generated. There are
-several factors to consider when using this module to generate and verify
-secure URLs: see the [Security Considerations](#security-considerations)
-section of this document.
+The exported middleware function has a [`.sign()`][sign] function property for
+generating signed URLs in the first place.  The idea is that a [Koa][koa]
+application can generate signed URLs for e.g. a password reset facility,
+distribute them via e.g. email or SMS, and then verify signatures on those URLs
+when they are used, essentially as ["capability" URLs ][capability]. Because
+[HMAC signatures](https://tools.ietf.org/html/rfc2104) are used, the [Koa][koa]
+application just stores application-level symmetric keys, rather than a dynamic
+list of all URLs that have ever been generated.  There are several factors to
+consider when using this module to generate and verify secure URLs: see the
+[Security Considerations](#security-considerations) section of this document.
 
 ## Example
 
@@ -51,23 +50,29 @@ app.use(function *() {
 
 ## API
 
-### koa-signed-url(keys, [sigId]) ⟶ { [Function] sign: [Function] }
+### koa-signed-url(keys, [sigId], [expId]) ⟶ { [Function] sign: [Function] }
 
 `keys` is either a single character string key (which should be at least 32
 characters in length), or an array of such keys, or a `Keygrip` object. `sigId`
 is optional, defaults to `"sig"`, and is the name of the query parameter used
-to hold the URL signature.
+to hold the URL signature. Likewise, `expId` is optional, defaults to `"exp"`,
+and is the name of the query parameter used to hold the datestamp when the URL
+signature expires.
 
 The returned function is usable as [Koa][koa] middleware. It will attempt to
 verify the URL signature on all requests. If it can verify the signature, it
 will simply yield to the next middleware. If it cannot, it will set
-`this.status = 404` and end request processing. This middleware function has a
-property `sign`, which is also a function:
+`this.status = 404` and end request processing. Those requests that also
+include an expiry timestamp (i.e. the query parameter name matches `expId`)
+will be rejected, if that time has already passed. This middleware function has
+a property `sign`, which is also a function:
 
-### sign (url)⟶ url
+### sign (url, [duration])⟶ url
 
 The `url` passed to this function is returned with a signature parameter
-appended to the query string.
+appended to the query string. If a non-zero `duration` is passed, an expiry
+timestamp will be appended before signing, so that the expiry will also be
+verified by the signature. `duration` is measured in milliseconds.
 
 ## Security Considerations
 
@@ -81,13 +86,12 @@ for signed URLs. The best policy is simply for such URLs to be extremely
 short-lived. Nothing in the current version of this module ensures that, but
 there are several steps one could take, depending on the situation.
 
-First, it seems wise to append an `expires=<timestamp>` query parameter to the
-URL *before* signing it. (The timestamp would be a date in the very near
-future.) Signature verification ensures that the timestamp may not be changed,
-and a simple timestamp is easy to vary in order to enforce desired policies.
-(This module handles signature verification, but does **not** check whether
-timestamps have elapsed!) In addition, timestamps act as anti-replay-attack
-"nonces".
+First, this module will generate an expiry timestamp query parameter whenever a
+`duration` is passed to the [`.sign()`][sign] function. The middleware will
+check that the timestamp is still in the future, when it's present in a signed
+URL. Signature verification ensures that the timestamp may not be changed or
+removed, and a simple `duration` is easy to vary in order to enforce desired
+policies. In addition, timestamps act as anti-replay-attack "nonces".
 
 Second, one could keep a dynamic "CRL"-style list of used URLs, and thus reject
 URLs that have already been accessed. (In some cases, a hash, a set, or even a
@@ -176,6 +180,7 @@ the module maintainer know of anything else that should be included.
 [MIT License](http://opensource.org/licenses/MIT). Any and all potential
 contributions of issues and pull requests are welcome!
 
+[sign]: #sign-url-duration-url
 [koa]: http://koajs.com/
 [keygrip]: https://www.npmjs.com/package/keygrip
 [capability]: http://www.w3.org/TR/capability-urls/
