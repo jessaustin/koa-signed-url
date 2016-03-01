@@ -54,7 +54,7 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
 
       sig = signedUrl.sign url, 1
       resp = yield request sig
-      yield sleep 50
+      yield sleep 500
       tape.equal resp.statusCode, 404, 'Should reject expired url'
 
     server.close()
