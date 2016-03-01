@@ -35,7 +35,7 @@ notifications could look like this:
 ```javascript
 var signed = require('koa-signed-url')(keys);
 app.use(route.post('/document/:id/', function *(id) {
-  yield sendEmail(signed.sign('https://example.com/shared-doc?id='+id));
+  yield sendEmail(signed.sign('https://example.com/shared-doc?id=' + id));
   this.status = 204
 }));
 ```
