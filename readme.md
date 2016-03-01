@@ -33,7 +33,7 @@ Suppose we have an application that allows users to share uploaded documents
 with their friends. The part of the application that generates "share"
 notifications could look like this:
 ```javascript
-signed = require('koa-signed-url')(keys);
+var signed = require('koa-signed-url')(keys);
 app.use(route.post('/document/:id/', function *(id) {
   yield sendEmail(signed.sign('https://example.com/shared-doc?id='+id));
   this.status = 204
@@ -50,7 +50,7 @@ app.use(function *() {
 
 ## API
 
-### koa-signed-url(keys, [sigId], [expId]) ⟶ { [Function] sign: [Function] }
+### koaSignedUrl(keys, [sigId], [expId]) ⟶ { [Function] sign: [Function] }
 
 `keys` is either a single character string key (which should be at least 32
 characters in length), or an array of such keys, or a `Keygrip` object. `sigId`
@@ -166,7 +166,7 @@ should be 256 bits in size. Since this identifier is used in a URL, it should
 be base64-encoded. The following produces the right sort of identifier:
 ```javascript
 id = require('crypto').pseudoRandomBytes(32).toString('base64');
-url = koaSignedUrl.sign('https://example.com/view-order?id=' + id);
+url = signed.sign('https://example.com/view-order?id=' + id);
 ```
 
 ### Please Suggest Additional Security Considerations
