@@ -154,7 +154,7 @@ object with the hash algorithm downgraded to e.g. SHA-1 or MD5.
 
 Depending on the situation, a simple url like
 ```
-https://example.com/reset-password?user=alice&expires=1448688469&sig=fh0B70oHoT0tjP9Ip+whuktdr8EcUjJVsJetJLUVJAE=
+https://example.com/reset-password?user=alice&exp=1448688469&sig=fh0B70oHoT0tjP9Ip+whuktdr8EcUjJVsJetJLUVJAE=
 ```
 may suffice. In other contexts, it may be necessary to generate a unique random
 identifier to include in a signed URL. This could be if the URL is of a
