@@ -17,7 +17,7 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
 
   keysList = [ 'secret', ['secret', 'another'], Keygrip ['secret', 'another'] ]
   pathParts = ['', 'path', '/subpath/', 'leaf.ext', '?q=query', '&r=queries']
-  tape.plan 8 * pathParts.length * keysList.length
+  tape.plan 9 * pathParts.length * keysList.length
 
   for keys in keysList
     url = "http://localhost:#{port}/"
@@ -34,6 +34,8 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
       url += part
 
       sig = signedUrl.sign url
+      tape.equal "#{sig}#fragment", signedUrl.sign("#{url}#fragment"),
+                                       'Should ignore fragment'
       resp = yield request sig
       tape.equal resp.statusCode, 200, 'Should verify correct signature.'
       tape.equal resp.body, body, 'Should serve correct body.'
