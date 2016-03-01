@@ -65,7 +65,7 @@ will simply yield to the next middleware. If it cannot, it will set
 `this.status = 404` and end request processing. Those requests that also
 include an expiry timestamp (i.e. the query parameter name matches `expId`)
 will be rejected, if that time has already passed. This middleware function has
-a property `sign`, which is also a function:
+a property `sign`, which is another function:
 
 ### sign (url, [duration])⟶ url
 
@@ -83,8 +83,8 @@ URLs will eventually be exposed, not least because their use in browsers is
 very difficult to conceal. That document describes detection and handling of
 compromised capability URLs, but that seems pointless for the uses we envision
 for signed URLs. The best policy is simply for such URLs to be extremely
-short-lived. Nothing in the current version of this module ensures that, but
-there are several steps one could take, depending on the situation.
+short-lived. There are several steps one could take to achieve this goal,
+depending on the situation.
 
 First, this module will generate an expiry timestamp query parameter whenever a
 `duration` is passed to the [`.sign()`][sign] function. The middleware will
