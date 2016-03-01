@@ -7,9 +7,9 @@ Released under MIT License
 debug = (require 'debug') 'koa-signed-url'
 Keygrip = require 'keygrip'
 
-add_query_parameter = (uri, name, value) ->
-  [ uri, query ] = uri.split '?'
-  "#{uri}?#{if query? then query + '&' else ''}#{name}=#{value}"
+add_query_parameter = (url, name, value) ->
+  [ url, query ] = url.split '?'
+  "#{url}?#{if query? then query + '&' else ''}#{name}=#{value}"
 
 # Export a function that returns url-signature-verifying middleware, with a
 # "sign" property containing a url-signing function. Urls are signed by
@@ -25,15 +25,15 @@ module.exports = (keys, sigId='sig', expId='exp') ->
   debug "using Keygrip with hash #{keys.hash} and keys #{keys}"
 
   fn = (next) ->          # this is the koa middleware
-    [ ..., uri, sig ] = @href.split ///[?&]#{sigId}=///
+    [ ..., url, sig ] = @href.split ///[?&]#{sigId}=///
     # Buffer will ignore anything after a '=', so check for that
     [ sig, rest... ] = sig.split '='
     rest = rest.reduce ((acc, {length}) -> acc or length), false
-    unless uri? and not rest and keys.verify uri, new Buffer sig, 'base64'
+    unless url? and not rest and keys.verify url, new Buffer sig, 'base64'
       @status = 404
       debug "failed to verify #{@href}"
     else
-      { query } = parse uri, yes
+      { query } = parse url, yes
       if parseInt(query[expId]) <= new Date().valueOf()
         @status = 404
         debug "#{@href} expired at #{query[expId]}"
@@ -41,14 +41,14 @@ module.exports = (keys, sigId='sig', expId='exp') ->
         debug "verified #{@href}"
         yield next
 
-  fn.sign = (uri, duration=0) ->  # sign() is a property of preceeding function
+  fn.sign = (url, duration=0) ->  # sign() is a property of preceeding function
     # don't sign fragment
-    [ uri, fragment ] = uri.split '#'
+    [ url, fragment ] = url.split '#'
     if duration
-      uri = add_query_parameter uri, expId, new Date().valueOf() + duration
-    sig = keys.sign uri
+      url = add_query_parameter url, expId, new Date().valueOf() + duration
+    sig = keys.sign url
       .toString 'base64'
-    debug "signing #{uri} with signature #{sig}"
-    add_query_parameter(uri, sigId, sig) + if fragment? then '#' + fragment else ''
+    debug "signing #{url} with signature #{sig}"
+    add_query_parameter(url, sigId, sig) + if fragment? then '#' + fragment else ''
 
   fn                      # now return the original function
