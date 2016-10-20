@@ -3,8 +3,7 @@ Copyright © 201{5,6} Jess Austin <jess.austin@gmail.com>
 Released under MIT License
 ###
 
-http = require 'http'
-Keygrip = require 'keygrip'
+{ createServer } = require 'http'
 koa = require 'koa'
 request = require 'co-request'
 sleep = require 'co-sleep'
@@ -15,7 +14,11 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
   body = 'This is a test.'
   port = 2999
 
-  keysList = [ 'secret', ['secret', 'another'], Keygrip ['secret', 'another'] ]
+  keysList = [
+    'secret'
+    ['secret', 'another']
+    require('keygrip') ['secret', 'another']
+  ]
   pathParts = ['', 'path', '/subpath/', 'leaf.ext', '?q=query', '&r=queries']
   tape.plan 9 * pathParts.length * keysList.length
 
@@ -27,7 +30,7 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
     app.use (next) ->
       @body = body
       yield next
-    server = http.createServer app.callback()
+    server = createServer app.callback()
       .listen port
 
     for part in pathParts
