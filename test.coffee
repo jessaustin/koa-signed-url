@@ -15,9 +15,9 @@ require('tape') 'Koa-Signed-URL Test', require('co-tape') (tape) ->
   port = 2999
 
   keysList = [
-    'secret'
-    ['secret', 'another']
-    require('keygrip') ['secret', 'another']
+    ks = ['secret', 'another']
+    ks[0]
+    require('keygrip') ks
   ]
   pathParts = ['', 'path', '/subpath/', 'leaf.ext', '?q=query', '&r=queries']
   tape.plan 9 * pathParts.length * keysList.length
